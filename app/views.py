@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
 from django.db.models.functions import Length
+from django.db.models import Q
 
 from app.models import *
 def insert_topic(request):
@@ -30,6 +31,14 @@ def display_webpages(request):
     LOW=Webpage.objects.all().order_by('-name')
     LOW=Webpage.objects.all().order_by(Length('name'))
     LOW=Webpage.objects.all().order_by(Length('name').desc())
+    LOW=Webpage.objects.filter(name__startswith='M')
+    LOW=Webpage.objects.filter(name__endswith='A')
+    LOW=Webpage.objects.filter(name__contains='n')
+    LOW=Webpage.objects.filter(name__in=('Ronaldo','MSD','Ashok'))
+    LOW=Webpage.objects.filter(name__regex='[A-Z-a-z]S\w+')
+    LOW=Webpage.objects.filter(Q(topic_name='Kabaddi') & Q(name='MSD'))
+    LOW=Webpage.objects.all()
+    
     
     d={'webpages':LOW}
     return render(request,'display_webpages.html',d)
@@ -43,13 +52,31 @@ def display_access(request):
     LOA=Access_Records.objects.filter(date__month='01')
     LOA=Access_Records.objects.filter(date__day='12')
     LOA=Access_Records.objects.filter(date__year__gt='1990')
-    
-    
-    
-    
+
     d={'access':LOA}
     return render(request,'display_access.html',d)
 
+def update_web(request):
+    #Webpage.objects.filter(topic_name='Kabaddi').update(name='Carroms')
+    #Webpage.objects.filter(name='Carroms').update(topic_name='Cricket')
+    #Webpage.objects.filter(topic_name='chess').update(name='Carlson')
+    t=Topic.objects.get_or_create(topic_name='Cricket')[0]
+    t.save()
+    #Webpage.objects.update_or_create(name='Carlson',defaults={'topic_name':t})
+    Webpage.objects.update_or_create(name=' Hardik Pandya',defaults={'topic_name':t,'url':'https://pandya1.in'})
+
+    LOW=Webpage.objects.all()
+
+    d={'webpages':LOW}
+    return render(request,'display_webpages.html',d)
+
+def delete_web(request):
+    Webpage.objects.filter(topic_name='FootBall').delete()
+    Webpage.objects.all().delete()
+    LOW=Webpage.objects.all()
+
+    d={'webpages':LOW}
+    return render(request,'display_webpages.html',d)
 
 
 
